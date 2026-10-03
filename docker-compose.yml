@@ -1,0 +1,46 @@
+services:
+
+  db:
+    image: postgres:16
+    container_name: med-intel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: med-intel-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      SECRET_KEY: ${SECRET_KEY}
+      MEDINTEL_ADMIN_PASSWORD: ${MEDINTEL_ADMIN_PASSWORD}
+      MEDINTEL_STAFF_PASSWORD: ${MEDINTEL_STAFF_PASSWORD}
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: med-intel-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+psycopg[binary]
+sqlalchemy
+alembic
+httpx
+pwdlib[argon2]
+PyJWT
+python-multipart

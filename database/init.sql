@@ -1,0 +1,4 @@
+-- Med-Intel database initialization
+--
+-- PostgreSQL creates the medintel database automatically.
+-- Application schema changes are managed by Alembic migrations.
